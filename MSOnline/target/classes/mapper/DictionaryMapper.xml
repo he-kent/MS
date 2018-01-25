@@ -1,0 +1,47 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hwq.msonline.dao.DictionaryDao">
+    <!-- 查询角字典列表 -->
+    <select id="getDates" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        SELECT  id,dic_name AS dicName, dic_status AS dicStatus, createtime, updatetime, dic_code AS dicCode, dic_note AS dicNote
+        FROM ms_dictionary 
+        WHERE 1=1
+        <if test="null != dicCode and '' != dicCode">
+           AND  dic_code =#{dicCode}
+        </if>
+         <if test="null != status and '' != status">
+           AND  dic_status =#{status}
+        </if>
+        <if test="null != dicname">
+          AND dic_name like "%"#{dicname}"%"
+        </if>
+    </select>
+    <!-- 根据ID查询 -->
+   <select id="getDateById" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+        SELECT  id,dic_name AS dicName, dic_status AS dicStatus, createtime, updatetime, dic_code AS dicCode, dic_note AS dicNote
+        FROM ms_dictionary 
+        WHERE id = #{id}
+   </select>
+   <insert id="add" parameterType="java.util.HashMap" >
+        INSERT INTO ms_dictionary (dic_name, dic_status, createtime, updatetime, dic_code, dic_note )
+        VALUES (#{dicName},#{dicStatus},#{createtime},#{updatetime},#{dicCode},#{dicNote})
+   </insert>
+   <update id="update" parameterType="java.util.HashMap">
+         UPDATE ms_dictionary SET dic_name=#{dicName}, dic_status=#{dicStatus},  updatetime=#{updatetime}, dic_code=#{dicCode}, dic_note=#{dicNote}
+         WHERE id=#{id} 
+   </update>
+   <delete id="delete" parameterType="java.util.HashMap">
+        DELETE FROM ms_dictionary  WHERE id=#{id}
+   </delete>
+   <!-- 根据dic_code 查询字典列表 dic_code 用来区分是那个模块的字典 -->
+   <select id="getDicByCode" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+          SELECT  id,dic_name AS dicName, dic_status AS dicStatus, createtime, updatetime, dic_code AS dicCode, dic_note AS dicNote
+        FROM ms_dictionary 
+        WHERE dic_code = #{dicCode} 
+   </select>
+   <update id="updateDicStatus" parameterType="java.util.HashMap" >
+      UPDATE ms_dictionary SET  dic_status=#{status}
+         WHERE id=#{id} 
+   </update>
+</mapper>

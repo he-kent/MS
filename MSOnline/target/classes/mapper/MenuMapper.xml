@@ -1,0 +1,61 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hwq.msonline.dao.MenuDao">
+     <select id="getNavMenus" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+             <!-- 查询pid=0 的菜单（祖宗级）menu_status=1(启用) -->
+           SELECT 
+			  mm.id, menu_name as menuName, menu_url as menuUrl, menu_status as menuStatus,createtime as createTime,
+			    updatetime as updateTime,  pid   
+             FROM ms_menu  mm
+             WHERE pid=0 and menu_status=1 
+             AND mm.id   AND  
+             find_in_set(mm.id, (select mrm.menuId from ms_user u  left join ms_role_menu mrm on u.roleId = mrm.roleId where u.id=#{id}))
+             
+             
+     </select>
+     <!-- 查询子菜单 根据用户的一级菜单查询子菜单 -->
+     <select id="getChildMenu" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+         SELECT  mm.id, menu_name as menuName, menu_url as menuUrl, menu_status as menuStatus,createtime as createTime,
+			    updatetime as updateTime,  pid   
+             FROM ms_menu  mm
+             WHERE menu_status=1  AND mm.pid = #{menuId}  
+             AND  find_in_set(mm.id, (select mrm.menuId from ms_user u  left join ms_role_menu mrm on u.roleId = mrm.roleId where u.id=#{userId}))
+            
+     </select>
+     <!-- 根据PID 查询子菜单  菜单列表 -->
+     <select id="getChildMenusByPid" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+          SELECT 
+			  mm.id, menu_name as menuName, menu_url as menuUrl, menu_status as menuStatus,createtime as createTime,
+			    updatetime as updateTime,  pid   
+             FROM ms_menu  mm 
+             WHERE mm.pid = #{id}
+     </select>
+     <!-- 查询所有菜单 菜单列表  pid = 0-->
+     <select id="getAllMenus" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+            SELECT  mm.id, menu_name as menuName, IFNULL(menu_url,"--") as menuUrl, menu_status as menuStatus,createtime as createTime,
+			    updatetime as updateTime,  pid   
+             FROM ms_menu  mm
+             WHERE mm.pid = 0
+     </select>
+     <!-- 添加菜单 -->
+     <insert id="add" parameterType="java.util.HashMap" >
+       INSERT INTO ms_menu (menu_name,menu_url, menu_status,createtime, updatetime,pid )
+       VALUES (#{menuName},#{menuUrl},#{menuStatu},#{createTime},#{updateTime},#{pid})
+     </insert>
+     <update id="update" parameterType="java.util.HashMap">
+          UPDATE ms_menu SET menu_name=#{menuName},menu_url=#{menuUrl},menu_status=#{menuStatu},updatetime=#{updateTime},pid=#{pid}
+          WHERE id = #{id}
+     </update>
+     <!-- 修改菜单状态 -->
+     <update id="updateMenuStatu" parameterType="java.util.HashMap">
+          UPDATE ms_menu SET menu_status = #{statu} WHERE id =#{id}
+     </update>
+       <!-- 根据ID查询菜单 -->
+     <select id="getDateById" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+          SELECT 
+			  mm.id, menu_name as menuName, menu_url as menuUrl, menu_status as menuStatus,createtime as createTime,
+			    updatetime as updateTime,  pid   
+             FROM ms_menu  mm 
+             WHERE mm.id = #{id}
+     </select>
+</mapper>

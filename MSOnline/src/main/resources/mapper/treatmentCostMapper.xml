@@ -1,0 +1,35 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hwq.msonline.dao.TreatmentCostDao">
+<insert id="add" parameterType="java.util.HashMap" >
+INSERT INTO treatment_cost (cus_case_id,treatment_cost,pay_status,pay_amount,pay_type,pay_card_num,pay_card_type,cus_id,createtime,updatetime,pay_time)
+ VALUES (#{cusCaseId},#{treatmentCost},#{payStatus},#{payAmount},#{payType},#{payCardNum},#{payCardType},#{cusId},#{createtime},#{updatetime},#{payTime})        
+</insert>
+<update id="update" parameterType="java.util.HashMap">
+   UPDATE treatment_cost SET
+   treatment_cost=#{treatmentCost},pay_status=#{payStatus},pay_amount=#{payAmount},pay_type=#{payType},pay_card_num=#{payCardNum},pay_card_type=#{payCardType},updatetime=#{updatetime},pay_time=#{payTime}
+   WHERE id=#{tcid}
+</update>
+<select id="getDates" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     SELECT cus.id AS cusId,cus.cus_name,cus.cus_sex,cus.cus_tel,`case`.id AS caseId,IFNULL(`case`.treatment_item,'') AS treatment_item,
+            `case`.physician_signature,cost.id AS costId,cost.treatment_cost,
+            CASE cost.pay_status
+            WHEN 1 THEN '未支付'
+            WHEN 2 THEN '已支付'
+            WHEN 3 THEN '已取消'
+            END AS pay_status
+            ,cost.pay_amount,
+            cost.pay_type,cost.pay_time,cost.pay_card_num,(select card_name from ms_vipcard vc where vc.id=cost.pay_card_type ) as pay_card_type
+     FROM
+     ms_customer AS cus
+     Inner Join ms_cus_case AS `case` ON cus.id = `case`.cus_id
+     Inner Join treatment_cost AS cost ON `case`.id = cost.cus_case_id
+     ORDER BY    cost.pay_time DESC
+</select>
+  <!-- 添加用户卡消耗记录 -->
+  <insert id="addCardConsumption" parameterType="java.util.HashMap">
+      INSERT INTO cus_consumption (cus_id,case_id,card_num,consumption_count,createtime,updatetime)
+      VALUES (#{cusId},#{cusCaseId},#{payCardNum},#{useCardCount},#{createtime},#{updatetime})
+  </insert>
+</mapper>

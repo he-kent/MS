@@ -1,0 +1,54 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hwq.msonline.dao.AccountDao">
+    <select id="getDates" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    SELECT
+    acc.id,acc.accMoney,acc.accType,
+    CASE acc.accItmes
+    WHEN 1 THEN '房租'
+    WHEN 2 THEN '水费'
+    WHEN 3 THEN '电费'
+    WHEN 4 THEN '其他'
+    END AS accItems,acc.accTime,acc.accNote,acc.accPeople
+    FROM companyacc AS acc
+    WHERE 1=1
+    <if test="null != accType">
+        AND acc.accType=#{accType}
+    </if>
+    <if test="null != start">
+         AND  acc.accTime &gt;=#{start}
+    </if>
+    <if test="null != end">
+        AND acc.accTime &lt;=#{end}
+    </if>
+    ORDER BY acc.accTime DESC
+    </select>
+    <insert id="add" parameterType="java.util.HashMap">
+         INSERT INTO companyacc (accMoney,accType,accItmes,accTime,accNote,accPeople)
+         VALUES(#{accMoney},#{accType},#{accItmes},#{accTime},#{accNote},#{accPeople})
+    </insert>
+    
+     <select id="getAccStat" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+    SELECT  sum(acc.accMoney) as accMoney,acc.accType,
+    CASE acc.accItmes
+    WHEN 1 THEN '房租'
+    WHEN 2 THEN '水费'
+    WHEN 3 THEN '电费'
+    WHEN 4 THEN '其他'
+    END AS accItems
+    FROM  companyacc AS acc
+    WHERE 1=1
+    <if test="null != accType">
+        AND acc.accType=#{accType}
+    </if>
+    <if test="null != start">
+         AND  acc.accTime &gt;=#{start}
+    </if>
+    <if test="null != end">
+        AND acc.accTime &lt;=#{end}
+    </if>
+    GROUP BY acc.accType,acc.accItmes
+    ORDER BY acc.accTime DESC
+    </select>
+</mapper>

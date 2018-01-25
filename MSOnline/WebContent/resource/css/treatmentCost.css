@@ -1,0 +1,19 @@
+#cusCaseDataGrid{
+	table-layout: fixed;
+}
+th{
+	width:100px;
+}
+#cusCaseDataGridBody tr td{
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#cusCanUseCardTab{
+	display:none;
+	font-size:12px;
+}
+#cusCanUseCardTab tbody tr{
+   cursor: pointer;
+}

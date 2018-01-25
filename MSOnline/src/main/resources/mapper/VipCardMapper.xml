@@ -1,0 +1,48 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 会员卡管理 -->
+<mapper namespace="com.hwq.msonline.dao.VipCardDao">
+   <!-- 查询card列表 -->
+    <select id="getDates" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+           SELECT  
+            id,card_name as cardName,card_status as cardStatus ,valid_num as validNum,expiry_time as expiryTime,
+            createtime, updatetime,( SELECT  dic_name  FROM ms_dictionary dic  WHERE dic_code='1001' AND dic.id=card_type) as cardType ,card_amount as cardAmount,card_number as cardNumber,card_note as cardNote
+           FROM ms_vipcard  
+           WHERE 1=1
+           <if test="cardname != null">
+                AND card_name like "%"#{cardname}"%"
+           </if>
+    </select>
+    <!-- 根据状态查询卡 -->
+      <select id="getEffectiveCard" parameterType="java.lang.Integer" resultType="java.util.HashMap" >
+           SELECT  
+            id,card_name as cardName,card_status as cardStatus ,valid_num as validNum,expiry_time as expiryTime,
+            createtime, updatetime,card_type as cardType ,card_amount as cardAmount,card_number as cardNumber,card_note as cardNote
+           FROM ms_vipcard  
+           WHERE card_status=#{cardStatus}
+    </select>
+     <select id="getDateById" parameterType="java.lang.Integer" resultType="java.util.HashMap" >
+           SELECT  
+            id,card_name as cardName,card_status as cardStatus ,valid_num as validNum,expiry_time as expiryTime,
+            createtime, updatetime,card_type as cardType ,card_amount as cardAmount,card_number as cardNumber,card_note as cardNote
+           FROM ms_vipcard  
+           WHERE id = #{id}
+    </select>
+    <insert id="add" parameterType="java.util.HashMap">
+          INSERT INTO ms_vipcard (card_name ,card_status,valid_num,expiry_time,createtime, updatetime,card_type ,card_amount,card_number ,card_note)
+          VALUES(#{cardName},#{cardStatus},#{validNum},#{expiryTime},#{createtime},#{updatetime},0,#{cardAmount},'',#{cardNote})
+    </insert>
+    <update id="update" parameterType="java.util.HashMap">
+        UPDATE ms_vipcard SET card_name=#{cardName} ,card_status=#{cardStatus},valid_num=#{validNum},
+                updatetime=#{updatetime},card_type=0,card_amount=#{cardAmount}
+               ,card_note=#{cardNote}
+        WHERE id =#{id}
+    </update>
+    <delete id="delete" parameterType="java.util.HashMap">
+       DELETE FROM ms_vipcard WHERE id=#{id}
+    </delete>
+    
+    <update id="updateCardStatus" parameterType="java.util.HashMap">
+        UPDATE ms_vipcard set card_status=#{status}  WHERE id =#{id}
+    </update>
+</mapper>

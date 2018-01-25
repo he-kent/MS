@@ -1,0 +1,67 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hwq.msonline.dao.CostStatDao">
+<!-- 按支付方式统计非VIP卡支付的金额 -->
+   <select id="getCostStatList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+   SELECT  sum(tc.pay_amount) as payAmount,
+					CASE  tc.pay_type
+					WHEN 2  THEN  '现金支付'
+					WHEN 3  THEN  '支付宝支付'
+					WHEN 4  THEN  '微信支付'
+					WHEN 5  THEN  '银行卡支付'
+					END  as payTypeMoney
+         FROM treatment_cost AS tc
+	     WHERE tc.pay_type>1  
+	     <if test="null != start ">
+	        AND  tc.pay_time &gt;= #{start}
+	     </if>
+	     <if test="null != end">
+	         AND  tc.pay_time &lt;= #{end}
+	     </if>
+	     GROUP BY tc.pay_type
+	     ORDER BY tc.pay_type
+    </select>
+    <!-- 按支付方式统计VIP卡支付的次数 -->
+     <select id="getCostCardStatList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+         SELECT   count(tc.pay_card_num) as payCardCount,
+                  CASE  tc.pay_type
+				  WHEN 1  THEN  'vip卡支付'
+				  END  as payTypeCount
+		  FROM treatment_cost AS tc
+          WHERE tc.pay_type =1
+           <if test="null != start ">
+	        AND  tc.pay_time &gt;= #{start}
+	      </if>
+	      <if test="null != end">
+	         AND  tc.pay_time &lt;= #{end}
+	      </if>
+          GROUP BY tc.pay_type
+    </select>
+   <!-- 按卡类 统计办卡金额 -->
+   <select id="getHandleCardMoney" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     SELECT sum(cc.card_money)  as cardMoney ,(select card_name from ms_vipcard where id=cc.card_type) as cardType 
+     FROM ms_cus_card cc
+      WHERE 1=1
+         <if test="null != start ">
+          AND  cc.handlestime &gt;= #{start}
+        </if>
+        <if test="null != end">
+          AND  cc.handlestime &lt;= #{end}
+        </if>
+     GROUP BY cc.card_type
+   </select>
+   <!-- 按卡类 统计办卡次数 -->
+   <select id="getHandleCardCount" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     SELECT COUNT(cc.id) as cardCount,(select card_name from ms_vipcard where id=cc.card_type) as cardType
+     FROM ms_cus_card cc
+      WHERE 1=1
+         <if test="null != start ">
+          AND  cc.handlestime &gt;= #{start}
+        </if>
+        <if test="null != end">
+          AND  cc.handlestime &lt;= #{end}
+        </if>
+     GROUP BY cc.card_type
+   </select>
+</mapper>

@@ -1,0 +1,49 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hwq.msonline.dao.UserDao">
+    <select id="getUserByName" parameterType="java.lang.String" resultType="java.util.HashMap">
+           SELECT 
+			   id, username , password,status ,nickname ,phone  ,createtime ,updatetime ,roleID ,avatar,address           
+	       FROM ms_user u
+	       WHERE u.username = #{username}
+    </select>
+    <!-- 查询用户列表 -->
+    <select id="getDates" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+          SELECT 
+			   id, username , password,status ,nickname ,phone  ,createtime ,updatetime ,roleID ,avatar,address,
+			   (SELECT rolename FROM ms_role r  WHERE r.roleId=u.roleID ) as roleName           
+	       FROM ms_user u
+	       WHERE  1=1
+	       <if test="username != null">
+	           AND u.username like "%"#{username}"%"
+	       </if>
+    </select>
+    <!-- 根据ID 查一个用户 -->
+    <select id="getDateById" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+          SELECT 
+			   id, username , password,status ,nickname ,phone  ,createtime ,updatetime ,roleID ,avatar,address           
+	       FROM ms_user u
+	       WHERE u.id = #{id}
+    </select>
+    <!-- 修改一个用户 -->
+    <update id="update" parameterType="java.util.HashMap">
+          UPDATE ms_user u SET 
+			   username=#{username} ,status=#{status} ,nickname=#{nickname} ,phone=#{phone},updatetime=#{updatetime} ,roleID=#{roleId} ,avatar=#{avatar},address=#{address}           
+	       WHERE u.id = #{id}
+    </update>
+    <delete id="delete" parameterType="java.util.HashMap">
+        DELETE  FROM  ms_user WHERE id=#{id}
+    </delete>
+    <insert id="add" parameterType="java.util.HashMap" >
+         INSERT INTO ms_user (username , password,status ,nickname ,phone  ,createtime ,updatetime ,roleID ,avatar,address )
+         VALUES(#{username},#{password},#{status},#{nickname},#{phone},#{createtime},#{updatetime},#{roleID},#{avatar},#{address})
+    </insert>
+    <update id="updateUserStatus" parameterType="java.util.HashMap">
+         UPDATE ms_user SET status=#{status} WHERE id=#{id}
+    </update>
+     <!-- 修改用户角色 -->
+    <update id="updateUserRole" parameterType="java.util.HashMap">
+        UPDATE ms_user SET roleID = #{roleId} WHERE id = #{userId}
+    </update>
+</mapper>

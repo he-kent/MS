@@ -1,0 +1,28 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 客户办卡 -->
+<mapper namespace="com.hwq.msonline.dao.CusCardDao">
+<!-- 办卡 -->
+  <insert id="add" parameterType="java.util.HashMap" >
+   INSERT INTO ms_cus_card (  cus_id,card_id,card_amount,card_money,createtime,updatetime,card_type,handles_card,handlestime,card_use_status,
+                             card_num ,expiry_time, handels_note,valid_num )
+   VALUES(#{cusId},#{cardId},#{cardAmount},#{cardMoney},#{createtime},#{updatetime},#{cardType},#{handlesCard},#{handlestime},#{cardUseStatus},
+           #{cardNum},#{expiryTime},#{handelsNote},#{validNum})
+  </insert>
+ <!-- 查询办卡列表 -->
+  <select id="getDates" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	SELECT ct.cus_name AS cusName,ct.cus_sex AS cusSex,ct.cus_birthday AS cusBirthday,ct.cus_address AS cusAddress,ct.cus_tel AS cusTel,
+	cc.cus_id AS cusId,cc.card_id AS cardId,cc.card_amount AS cardAmount,cc.card_money AS cardMoney,(SELECT card_name FROM ms_vipcard WHERE id=cc.card_type) AS cardType,
+	cc.handles_card AS handlesCard,cc.handlestime AS handlestime,(SELECT dic_name FROM ms_dictionary WHERE dic_code=1002 AND dic_status=cc.card_use_status) AS cardUseStatus,cc.card_num AS cardNum,
+	cc.expiry_time AS expirytime,cc.handels_note AS handlesNote,cc.id,cc.valid_num AS validNum
+	FROM
+	ms_customer AS ct
+	Inner Join ms_cus_card AS cc ON ct.id = cc.cus_id
+	WHERE 1=1
+	<if test=" null != cusCardNameOrTel">
+	    AND (ct.cus_name like "%"#{cusCardNameOrTel}"#%" OR ct.cus_tel like "%"#{cusCardNameOrTel}"%")
+	</if>
+	ORDER BY
+	cc.createtime DESC
+ </select>
+</mapper>

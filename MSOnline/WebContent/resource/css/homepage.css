@@ -1,0 +1,17 @@
+.homebox{
+	widht:100%;
+	height:100%;
+	box-sizing:border-box;
+	display: flex;
+	display:-webkit-flex;
+}
+.homebox div{
+	border:1px solid #eee;
+	flex:1;
+}
+.homeChatrs{
+	widht:350px;
+	height:300px;
+	justify-content:center;
+	border:1px solid green;
+}

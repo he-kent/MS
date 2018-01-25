@@ -1,0 +1,29 @@
+@CHARSET "utf-8";
+html,body{
+	width:100%;
+	height:100%;
+	background-color:#F8F8F8;
+	font-family: '行楷';
+}
+.warp{
+	width:100%;
+	height:100%;
+	display:-webkit-flex;
+	display:flex;
+	align-items:center;
+	-webkit-align-items:center;
+	-webkit-justify-content:center;
+	justify-content:center;
+	background-color: #003485;
+	background: -webkit-linear-gradient(#003485, #fff); /* Safari 5.1 - 6.0 */
+    background: -o-linear-gradient(#003485, #fff); /* Opera 11.1 - 12.0 */
+    background: -moz-linear-gradient(r#003485, #fff); /* Firefox 3.6 - 15 */
+    background: linear-gradient(#003485, #fff); /* 标准的语法 */
+}
+.logincontainer{
+	width:40%;
+}
+.logincontainer .panel-primary {
+    border-color: #337ab7;
+    box-shadow: 3px 0px 130px 5px rgb(66, 117, 169), 3px 0px 130px 5px rgb(66, 117, 169);
+}

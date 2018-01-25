@@ -1,0 +1,60 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 病历管理 -->
+<mapper namespace="com.hwq.msonline.dao.CusCaseDao">
+    <insert id="addCase" parameterType="java.util.HashMap" useGeneratedKeys="true" keyProperty="id">
+       INSERT INTO ms_cus_case (cus_id,ms_institution,ms_department,see_doctor_time,first_see_doctor_time,health_number,ms_height,
+                   heart_rate,blood_sugar,blood_fat,blood_pressure,mainly_about,allergy,hpi,past_medical_history,hiistory_medicine,medication_history,
+                   chronic_illness,genetic_history,auxiliary_examination,physical_check,chinese_medicine,western_medicine,treatment_options,
+                   updatetime,createtime,physician_signature,ms_note,treatment_item)
+        VALUES (#{cusId},#{msInstitution},#{msDepartment},#{seeDoctorTime},#{firstSeeDoctorTime},#{healthNumber},#{msHeight},
+               #{heartRate},#{bloodSugar},#{bloodFat},#{bloodPressure},#{mainlyAbout},#{allergy},#{hpi},#{pastMedicalHistory},
+               #{hiistoryMedicine},#{medicationHistory},#{chronicIllness},#{geneticHistory},#{auxiliaryExamination},
+               #{physicalCheck},#{chineseMedicine},#{westernMedicine},#{treatmentOptions},#{updatetime},#{createtime},#{physicianSignature},#{caseNote}
+               ,#{treatmentItem})
+    </insert>
+    <select id="getDates" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	   SELECT
+			cus.cus_name,cus.cus_tel,cus.cus_sex,cc.id,cc.ms_department,cc.cus_id,cc.ms_institution,cc.see_doctor_time,
+			cc.first_see_doctor_time,cc.ms_height,cc.allergy,cc.treatment_options,cc.physician_signature,tc.pay_status,
+			tc.id AS tcid,
+			CASE tc.pay_status
+			WHEN 1 THEN '未支付'
+			WHEN 2 THEN '已支付'
+			WHEN 3 THEN '已取消'
+			END AS payStatus,
+			treatment_item 	
+			FROM
+			ms_customer AS cus 
+			INNER JOIN
+			ms_cus_case AS cc 
+			ON cus.id=cc.cus_id
+			INNER JOIN
+			treatment_cost AS tc
+			ON cc.id = tc.cus_case_id
+			WHERE  1=1 
+			<if test="null != cusName">
+			    AND cus.cus_name = #{cusName}
+			</if>
+			<if test="null != cusTel">
+			    AND cus.cus_tel = #{cusTel}
+			</if>
+			ORDER BY tc.pay_status ASC,tc.createtime DESC 
+    </select>
+     <select id="getDateById" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+     SELECT
+			cus.cus_name,cus.cus_tel,cus.cus_sex,cc.id,cc.ms_department,cc.cus_id,cc.ms_institution,cc.see_doctor_time,
+			cc.first_see_doctor_time,cc.health_number,cc.ms_height,cc.heart_rate,cc.blood_sugar,cc.blood_fat,cc.blood_pressure,
+			cc.mainly_about,cc.allergy,cc.hpi,cc.past_medical_history,cc.hiistory_medicine,cc.medication_history,
+			cc.chronic_illness,cc.genetic_history,cc.auxiliary_examination,cc.physical_check,cc.chinese_medicine,
+			cc.western_medicine,cc.treatment_options,cc.createtime,cc.physician_signature,cc.ms_note,treatment_item		
+			FROM
+			ms_customer AS cus 
+			INNER JOIN
+			ms_cus_case AS cc 
+			ON cus.id=cc.cus_id
+			WHERE cc.id=#{id}
+			
+    </select>
+    
+</mapper>

@@ -1,0 +1,70 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hwq.msonline.dao.CusDao">
+   <select id="getDates" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+           SELECT 
+              id,cus_name AS cusName ,cus_sex AS cusSex,cus_birthday AS cusBirthday,cus_address AS cusAddress,cus_tel AS cusTel,createtime,updatetime,ms_note AS cusNote
+           FROM ms_customer
+           WHERE 1=1 
+           <if test="null !=cusNameOrTel">
+                 AND (cus_name like "%"#{cusNameOrTel}"%" OR cus_tel like "%"#{cus_tel}"%")
+           </if>
+           ORDER BY createtime DESC
+   </select>
+  <select id="getDateById" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+           SELECT 
+              id,cus_name AS cusName ,cus_sex AS cusSex,cus_birthday AS cusBirthday,cus_address AS cusAddress,cus_tel AS cusTel,createtime,updatetime,ms_note AS cusNote
+           FROM ms_customer
+           WHERE id = #{id}
+  </select>
+  <insert id="add" parameterType="java.util.HashMap" >
+          INSERT INTO ms_customer (cus_name,cus_sex,cus_birthday,cus_address,cus_tel,createtime,updatetime,ms_note)
+          VALUES(#{cusName},#{cusSex},#{cusBirthday},#{cusAddress},#{cusTel},#{createtime},#{updatetime},#{cusNote})
+  </insert>
+  <delete id="delete" parameterType="java.util.HashMap">
+          DELETE FROM ms_customer WHERE id=#{id}
+  </delete>
+  <update id="update" parameterType="java.util.HashMap">
+        UPDATE  ms_customer  
+        SET cus_name=#{cusName},cus_sex=#{cusSex},cus_birthday=#{cusBirthday},cus_address=#{cusAddress},cus_tel=#{cusTel},updatetime=#{updatetime},ms_note=#{cusNote}
+        WHERE id=#{id}
+  </update>
+  <select id="getCardConsumpList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+  SELECT cus.id AS cusId,cus.cus_name,cus.cus_sex,cus.cus_tel,cc.valid_num,cc.id,cc.card_id, cc.card_type as cardType,
+         (SELECT card_name from ms_vipcard where id=cc.card_type) as card_type,cc.handles_card, cc.handlestime,cc.card_use_status,cc.card_num,cc.expiry_time, 
+         IFNULL((SELECT sum(ccp.consumption_count) FROM cus_consumption ccp group by ccp.card_num having ccp.card_num=cc.card_num ) ,0)as cardUsed,
+         (cc.valid_num-IFNULL((SELECT sum(ccp.consumption_count) FROM cus_consumption ccp GROUP BY ccp.card_num having ccp.card_num=cc.card_num ) ,0) ) as remain
+  FROM ms_customer AS cus
+  Inner Join ms_cus_card AS cc ON cus.id = cc.cus_id
+  WHERE 1=1
+    <if test="null != card_use_status and card_use_status !='' ">
+       AND cc.card_use_status = #{card_use_status}
+    </if>
+     <if test="null != cusName and cusName != '' ">
+       AND cus.cus_name = #{cusName}
+    </if>
+     <if test="null != cusTel and cusTel != '' ">
+      AND cus.cus_tel = #{cusTel}
+    </if>
+     <if test="null != cusCardNum and cusCardNum != ''">
+      AND cc.card_num = #{cusCardNum}
+    </if>
+  </select>
+   <select id="getCardConsumpDetailList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+     SELECT cus.cus_name,cus.cus_sex,cus.cus_tel,con.id,con.consumption_count,con.cus_id,con.case_id,con.card_num,con.createtime
+     FROM  cus_consumption AS con
+     Inner Join ms_customer AS cus ON con.cus_id = cus.id
+     WHERE 1=1
+     <if test="null != cusName and cusName != '' ">
+       AND cus.cus_name = #{cusName}
+    </if>
+     <if test="null != cusTel and cusTel != '' ">
+      AND cus.cus_tel = #{cusTel}
+    </if>
+     <if test="null != cusCardNum and cusCardNum != ''">
+      AND con.card_num = #{cusCardNum}
+    </if>
+  </select>
+  
+</mapper>
